@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Checkpoints / weights / rollout dumps
+*.pt
+*.bin
+*.ckpt
+*.safetensors
+
+# Logs and run artifacts
+*.log
+nohup.out
+wandb/
+ray_temp/
+outputs/
+
+# Local data (root-level only — tau-bench env data under
+# slime/examples/tau-bench/tau_bench/envs/*/data/ is part of the benchmark
+# and must stay tracked)
+/data/
+/datasets/data/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+.ipynb_checkpoints/

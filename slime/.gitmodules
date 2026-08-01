@@ -1,0 +1,3 @@
+[submodule "examples/r2e-swe/R2E-Gym"]
+	path = examples/r2e-swe/R2E-Gym
+	url = https://github.com/agentica-project/R2E-Gym.git

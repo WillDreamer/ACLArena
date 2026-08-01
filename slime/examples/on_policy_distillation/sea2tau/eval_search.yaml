@@ -1,0 +1,29 @@
+# Eval datasets for the SEARCH-domain OPD run (run_8b_opd.sh).
+#
+# Why a YAML instead of the simpler `--eval-prompt-data name path` pair:
+# this OPD run sets `--custom-rm-path slime.rollout.on_policy_distillation.reward_func`
+# (the teacher reward), and `async_rm` ALWAYS prefers `custom_rm_path` when set.
+# So eval must NOT route through async_rm or it would score with the teacher
+# reward (and need the teacher up at eval time). The per-dataset
+# `custom_generate_function_path` below points eval at `generate_eval`, which
+# runs the search rollout AND fills in `sample.reward` with the real EM task
+# score — `generate_and_rm` then skips async_rm because the reward is already
+# set. (`custom_generate_function_path` is only settable via --eval-config,
+# which is the whole reason this file exists.)
+#
+# `generate_with_search_tools_qwen_sft_no_drift` is importable because
+# run_8b_opd.sh puts examples/search-r1 on PYTHONPATH.
+eval:
+  defaults:
+    # Match the search-r1 reference run: 1 sample/prompt, sampling params fall
+    # back to the rollout values (temperature=1, max_response_len=4096) since
+    # they are not overridden here.
+    n_samples_per_eval_prompt: 1
+  datasets:
+    - name: nq_test
+      path: /data/user/ARLArena/datasets/data/searchR1_processed_direct/test_small.parquet
+      input_key: prompt
+      label_key: reward_model
+      # Search rollout that ALSO assigns the EM task reward (bypasses the
+      # OPD teacher reward). See generate_eval in the search-r1 module.
+      custom_generate_function_path: generate_with_search_tools_qwen_sft_no_drift.generate_eval

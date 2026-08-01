@@ -1,0 +1,32 @@
+# Eval dataset for the TAU-domain OPD runs (run_8b_opd.sh / run_8b_eopd.sh / run_8b_gkdopd.sh).
+#
+# Why a YAML instead of the simpler `--eval-prompt-data name path` pair:
+# these OPD runs set `--custom-rm-path slime.rollout.on_policy_distillation.reward_func[_eopd]`
+# (the teacher reward), and `async_rm` ALWAYS prefers `custom_rm_path` when the
+# generated sample has no reward yet. The TRAIN generate fn
+# (generate_with_tau_opd.generate) deliberately leaves sample.reward = None so the
+# teacher RM scores the student's tokens. If eval reused that fn it would also route
+# through the teacher RM and report teacher logprob, not task success.
+#
+# So eval points at generate_with_tau_opd.generate_eval, which runs the SAME
+# tau-bench trajectory but KEEPS the real tau-bench task reward (res.reward). With
+# the reward already set, generate_and_rm skips async_rm and eval reports true task
+# success. (`custom_generate_function_path` is only settable via --eval-config,
+# which is the whole reason this file exists.)
+#
+# generate_with_tau_opd / generate_with_tau are importable because the run scripts
+# put examples/tau-bench and this dir (tau2if) on PYTHONPATH.
+eval:
+  defaults:
+    # Match the tau-bench reference run (run_qwen3_8B.sh EVAL_ARGS): 1 sample/prompt,
+    # eval temperature 0.7, response cap 2048.
+    n_samples_per_eval_prompt: 1
+    temperature: 0.7
+    max_response_len: 2048
+  datasets:
+    - name: retail-dev
+      path: /data/user/tau-bench/retail_test_tasks.jsonl
+      input_key: index
+      # tau-bench rollout that ALSO keeps the real task reward (bypasses the OPD
+      # teacher reward). See generate_eval in generate_with_tau_opd.py.
+      custom_generate_function_path: generate_with_tau_opd.generate_eval

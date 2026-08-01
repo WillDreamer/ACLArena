@@ -1,0 +1,41 @@
+# TIS / mismatch config for the Qwen3-8B search LoRA run.
+# Forked from mis_8b.yaml. The ONLY differences: the rejection-sampling VETO and
+# mask bounds are relaxed, because the LoRA run's train-engine-vs-SGLang-rollout
+# logprob mismatch is ~2x larger (mis_ppl_ratio ~1.9 vs ~1.25 non-LoRA), which made
+# the strict veto (rs_veto_threshold 1e-4) reject ~99.7% of sequences -> the whole
+# batch's loss mask went to 0 -> train/grad_norm == 0 -> the adapter never trained.
+# See memory lora-ckpt-save-untrained-bug: this is the actual learning blocker.
+#
+# We KEEP importance-sampling truncation (variance control) but DISABLE the veto and
+# widen the RS mask window so gradient actually flows. TIS still down-weights the
+# most-mismatched tokens; we just don't hard-reject entire sequences.
+
+# Enable importance sampling, details refer to the comments of compute_mis_weights in mis.py
+use_tis: true
+# DISABLE rejection sampling (mask + veto). This is the change that unblocks gradient.
+use_rs: false
+
+# Aggregation level for importance sampling weights.
+tis_level: "token"
+rs_level: "token"
+
+# Handling mode for IS weights: truncate caps to upper bound (keeps grad, just re-weights).
+tis_mode: "truncate"
+
+# Truncate mode does not use the lower bound; keep for completeness.
+tis_lower_bound: 0.5
+
+# Upper bound for IS weights (truncate). Widened so heavily-mismatched (but not
+# catastrophic) tokens still contribute a bounded, nonzero weight.
+tis_upper_bound: 4.0
+
+# Rejection-sampling bounds (unused when use_rs=false, kept for completeness).
+rs_lower_bound: null
+rs_upper_bound: null
+
+# Per-token veto threshold. null => NO veto (do not zero whole sequences). This is the
+# key relaxation vs mis_8b.yaml (which used 1.0e-4 and rejected essentially every seq).
+rs_veto_threshold: null
+
+# Batch normalization: normalize IS weights to mean=1.0 across entire batch.
+tis_batch_normalize: true

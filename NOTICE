@@ -1,0 +1,16 @@
+ACLArena
+Copyright The ACLArena Authors
+
+This product includes software developed as a derivative work of slime
+(https://github.com/THUDM/slime), licensed under the Apache License,
+Version 2.0. The upstream license text is retained at slime/LICENSE.
+
+Modifications relative to upstream slime include additional training
+recipes and rollout/environment code under slime/examples/ (SDFT,
+tau-bench, search-r1, on-policy distillation, ProEvolve) together with
+supporting changes in slime/slime/, and the LoRA diagnostics in
+lora_probe/.
+
+slime/examples/tau-bench/tau_bench/ contains a vendored and modified copy
+of tau-bench (https://github.com/sierra-research/tau-bench); see that
+project for its original license terms.

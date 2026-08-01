@@ -1,0 +1,39 @@
+# Eval datasets for the MATH-domain OPD runs (run_8b_opd.sh / run_8b_gkdopd.sh / run_8b_eopd.sh).
+#
+# Why a YAML instead of the simpler `--eval-prompt-data name path` pair:
+# these OPD runs set `--custom-rm-path slime.rollout.on_policy_distillation.reward_func[_eopd]`
+# (the teacher reward), and `async_rm` ALWAYS prefers `custom_rm_path` when the
+# generated sample has no reward yet. A plain `--eval-prompt-data aime ...` would
+# therefore score every eval trajectory with the TEACHER logprob reward (and need
+# the teacher up at eval time), not the real math accuracy.
+#
+# So eval points at generate_with_math_opd.generate_eval, which runs the SAME
+# single-turn math rollout but then fills sample.reward with the rule-based
+# deepscaler math score (extract \boxed{...}, grade vs the label). With the reward
+# already set, generate_and_rm skips async_rm and eval reports true math accuracy.
+# (`custom_generate_function_path` is only settable via --eval-config, which is the
+# whole reason this file exists.)
+#
+# generate_with_math_opd is importable because the run scripts put this dir
+# (math2sea) on PYTHONPATH. The chat-list prompts are templated by the global
+# --apply-chat-template (eval datasets inherit it; see sglang_rollout.py:508).
+eval:
+  defaults:
+    # AIME is tiny (30 questions) and high-variance, so sample a few per prompt and
+    # average. Lower temperature than the temp=1 rollout for a cleaner accuracy read.
+    n_samples_per_eval_prompt: 4
+    temperature: 0.6
+    max_response_len: 8192
+  datasets:
+    - name: aime-2024
+      path: /data/user/slime/data/aime-2024.jsonl
+      input_key: prompt
+      label_key: label
+      # Single-turn math rollout that ALSO assigns the real deepscaler reward
+      # (bypasses the OPD teacher reward). See generate_eval in generate_with_math_opd.py.
+      custom_generate_function_path: generate_with_math_opd.generate_eval
+    - name: aime-2025
+      path: /data/user/slime/data/aime-2025.jsonl
+      input_key: prompt
+      label_key: label
+      custom_generate_function_path: generate_with_math_opd.generate_eval
