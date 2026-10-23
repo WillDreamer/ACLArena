@@ -1,0 +1,22 @@
+{
+  "math_expert": {
+    "model_id": "",
+    "model_name": "math_expert",
+    "base_url": "http://127.0.0.1:30601/v1"
+  },
+  "search_expert": {
+    "model_id": "",
+    "model_name": "search_expert",
+    "base_url": "http://127.0.0.1:30602/v1"
+  },
+  "ecommerce_expert": {
+    "model_id": "",
+    "model_name": "ecommerce_expert",
+    "base_url": "http://127.0.0.1:30603/v1"
+  },
+  "if_expert": {
+    "model_id": "",
+    "model_name": "if_expert",
+    "base_url": "http://127.0.0.1:30600/v1"
+  }
+}

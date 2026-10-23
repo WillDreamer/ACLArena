@@ -52,6 +52,7 @@ which is why checkpoints are named e.g.
 | `slime/examples/SDFT/` | Oracle-mixture SFT, including the domain-balanced batch sampler. |
 | `slime/examples/on_policy_distillation/` | OPD / EOPD / GKD recipes, pairwise and `multi_teacher/`. |
 | `slime/examples/eval_multi_task/` | One eval config covering AIME, GPQA and IFBench. |
+| `slime/examples/mle/` | Mixture of Low-Rank Experts Inference. |
 | `lora_probe/` | Standalone LoRA weight-update diagnostics used while debugging the LoRA path. |
 
 ## 1. Sequential (multi-stage) post-training

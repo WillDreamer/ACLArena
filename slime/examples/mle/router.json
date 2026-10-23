@@ -1,0 +1,32 @@
+{
+  "classifier": {
+    "model_id": "Qwen/Qwen3-8B-Base",
+    "model_name": "router_base",
+    "base_url": "http://127.0.0.1:30604/v1"
+  },
+  "max_new_tokens": 64,
+  "timeout_seconds": 600,
+  "answer_timeout_seconds": 7200,
+  "serving": {
+    "tp_size": 2,
+    "dtype": "bfloat16",
+    "context_length": 32768,
+    "mem_fraction_static": 0.85,
+    "disable_radix_cache": true,
+    "max_running_requests": 128,
+    "cuda_graph_max_bs": 128,
+    "random_seed": 42,
+    "tool_call_parser": "qwen"
+  },
+  "completion_template": "{policy}\nInput: {canonical_task_data}\nOutput:\n",
+  "answer_defaults": {
+    "seed": 42,
+    "chat_template_kwargs": {
+      "enable_thinking": true
+    },
+    "stop": [
+      "<|im_end|>"
+    ],
+    "skip_special_tokens": false
+  }
+}
